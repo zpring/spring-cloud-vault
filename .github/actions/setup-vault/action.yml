@@ -1,0 +1,25 @@
+name: Setup and Start Vault
+description: 'Download and start a Vault server'
+inputs:
+  vault-version:
+    description: 'Version of Vault to download'
+    required: false
+runs:
+  using: composite
+  steps:
+    - name: Cache Vault
+      uses: actions/cache@v5.0.5
+      with:
+        path: |
+          download
+          vault
+        key: ${{ runner.os }}-vault-${{ inputs.vault-version != '' && inputs.vault-version || 'default' }}
+    - name: Create CA certificates
+      shell: bash
+      run: src/test/bash/create_certificates.sh
+    - name: Install Vault
+      shell: bash
+      run: src/test/bash/install_vault.sh
+    - name: Run Vault
+      shell: bash
+      run: src/test/bash/local_run_vault.sh &
